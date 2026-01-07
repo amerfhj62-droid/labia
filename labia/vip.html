@@ -399,36 +399,54 @@ function fecharBancos(){
   document.getElementById("bankModal").classList.add("hidden");
 }
 
-// 🚀 NOVA FUNÇÃO — abre o app do banco
 function abrirBanco(banco) {
-  let url = "";
-
-  switch (banco) {
-    case "nubank":
-      url = "nubank://";
-      break;
-    case "itau":
-      url = "itau://";
-      break;
-    case "inter":
-      url = "bancointer://";
-      break;
-    case "c6":
-      url = "c6bank://";
-      break;
-    case "neon":
-      url = "neon://";
-      break;
-    default:
-      alert("Banco não suportado.");
-      return;
-  }
-
-  // fecha o modal
   fecharBancos();
 
-  // tenta abrir o app do banco
-  window.location.href = url;
+  const ua = navigator.userAgent || navigator.vendor || window.opera;
+  const isAndroid = /android/i.test(ua);
+  const isIOS = /iPad|iPhone|iPod/.test(ua);
+
+  const links = {
+    nubank: {
+      android: "https://play.google.com/store/apps/details?id=com.nu.production",
+      ios: "https://apps.apple.com/br/app/nubank/id814456780",
+      web: "https://nubank.com.br"
+    },
+    itau: {
+      android: "https://play.google.com/store/apps/details?id=com.itau",
+      ios: "https://apps.apple.com/br/app/itau/id474505665",
+      web: "https://www.itau.com.br"
+    },
+    inter: {
+      android: "https://play.google.com/store/apps/details?id=br.com.intermedium",
+      ios: "https://apps.apple.com/br/app/banco-inter/id951812587",
+      web: "https://www.bancointer.com.br"
+    },
+    c6: {
+      android: "https://play.google.com/store/apps/details?id=com.c6bank.app",
+      ios: "https://apps.apple.com/br/app/c6-bank/id1460460334",
+      web: "https://www.c6bank.com.br"
+    },
+    neon: {
+      android: "https://play.google.com/store/apps/details?id=br.com.neon",
+      ios: "https://apps.apple.com/br/app/neon/id1111816971",
+      web: "https://www.neon.com.br"
+    }
+  };
+
+  const bancoLinks = links[banco];
+  if (!bancoLinks) {
+    alert("Banco não suportado.");
+    return;
+  }
+
+  if (isAndroid) {
+    window.location.href = bancoLinks.android;
+  } else if (isIOS) {
+    window.location.href = bancoLinks.ios;
+  } else {
+    window.location.href = bancoLinks.web;
+  }
 }
 
 function pagar1Clique() {
