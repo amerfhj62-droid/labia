@@ -167,6 +167,54 @@ body{
     box-shadow: 0 0 6px rgba(26, 255, 108, 0.9);
   }
 }
+
+/* ===== MODAL 1 CLIQUE ===== */
+.bank-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+.bank-modal.hidden{display:none}
+
+.bank-box{
+  background:#111;
+  color:#fff;
+  padding:20px;
+  border-radius:14px;
+  width:90%;
+  max-width:320px;
+  text-align:center;
+}
+
+.bank-box h3{margin-bottom:12px}
+
+.bank-box button{
+  width:100%;
+  margin:6px 0;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  font-weight:700;
+  cursor:pointer;
+  background:#b30000;
+  color:#fff;
+}
+
+.bank-box .hint{
+  font-size:12px;
+  opacity:.75;
+  margin-top:10px;
+}
+
+.bank-box .close{
+  background:#333;
+  margin-top:12px;
+}
 </style>
 </head>
 
@@ -234,7 +282,8 @@ botMsg("Para manter tudo funcionando e ajudar nas manutenções,\ncobramos apena
 /* ===== BOTÃO ÚNICO ===== */
 setTimeout(()=>{
   setButtons([
-    { text: "💳 Gerar PIX R$10", action: gerarPix }
+    { text: "💳 Gerar PIX R$10", action: gerarPix },
+    { text:"⚡ Pague com 1 clique", action:abrirBancos }
   ]);
 }, 10000);
 
@@ -262,9 +311,11 @@ async function checarPagamento(){
   botMsg("⏳ Verificando pagamento...", 300);
 
   try {
-    const res = await fetch(
-      `https://pix-backend-cfok.onrender.com/status/${paymentId}`
-    );
+    const r = await fetch(
+  "https://pix-backend-cfok.onrender.com/pagar-1-clique",
+  { method: "POST" }
+  );
+
 
     const data = await res.json();
 
@@ -335,7 +386,43 @@ async function gerarPix(){
     botMsg("❌ Não foi possível gerar o PIX. Tente novamente.", 1200);
   }
 }
+
+// ===== 1 CLIQUE =====
+function abrirBancos(){
+  document.getElementById("bankModal").classList.remove("hidden");
+}
+
+function fecharBancos(){
+  document.getElementById("bankModal").classList.add("hidden");
+}
+
+async function pagar1Clique(){
+  const box=document.querySelector(".bank-box");
+  box.innerHTML="<p>Conectando com seu banco...</p>";
+  const r=await fetch("https://pix-backend-cfok.onrender.com",{method:"POST"});
+  const d=await r.json();
+  window.location.href=d.init_point;
+}
 </script>
+
+<div id="bankModal" class="bank-modal hidden">
+  <div class="bank-box">
+    <h3>Escolha seu banco</h3>
+
+    <button onclick="pagar1Clique()">Nubank</button>
+    <button onclick="pagar1Clique()">Itaú</button>
+    <button onclick="pagar1Clique()">PagBank</button>
+    <button onclick="pagar1Clique()">Banco Inter</button>
+    <button onclick="pagar1Clique()">C6 Bank</button>
+    <button onclick="pagar1Clique()">Neon</button>
+
+    <p class="hint">
+      O pagamento será aberto no app do banco, se disponível no seu celular.
+    </p>
+
+    <button class="close" onclick="fecharBancos()">Cancelar</button>
+  </div>
+</div>
 
 </body>
 </html>
