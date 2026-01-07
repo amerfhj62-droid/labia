@@ -311,28 +311,22 @@ async function checarPagamento(){
   botMsg("⏳ Verificando pagamento...", 300);
 
   try {
-    const r = await fetch(
-  "https://pix-backend-cfok.onrender.com/pagar-1-clique",
-  { method: "POST" }
-  );
-
+    const res = await fetch(
+      `https://pix-backend-cfok.onrender.com/status/${paymentId}`
+    );
 
     const data = await res.json();
 
     if (data.status === "approved") {
+      localStorage.setItem("isVIP", "true");
 
-  // 🔓 libera VIP para o index.html
-  localStorage.setItem("isVIP", "true");
+      botMsg("🎉 Pagamento confirmado! Seu acesso VIP foi liberado.", 800);
 
-  botMsg("🎉 Pagamento confirmado! Seu acesso VIP foi liberado.", 800);
-
-  // ⏩ redireciona para o index após 2 segundos
-  setTimeout(() => {
-    window.location.href = "index.html";
-  }, 2000);
-
-} else {
-      botMsg("⏳ Pagamento ainda não confirmado. finalize o pagamento e clique novamente.", 800);
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 2000);
+    } else {
+      botMsg("⏳ Pagamento ainda não confirmado.", 800);
     }
 
   } catch (e) {
@@ -397,11 +391,21 @@ function fecharBancos(){
 }
 
 async function pagar1Clique(){
-  const box=document.querySelector(".bank-box");
-  box.innerHTML="<p>Conectando com seu banco...</p>";
-  const r=await fetch("https://pix-backend-cfok.onrender.com",{method:"POST"});
-  const d=await r.json();
-  window.location.href=d.init_point;
+  const box = document.querySelector(".bank-box");
+  box.innerHTML = "<p>Conectando com seu banco...</p>";
+
+  try {
+    const r = await fetch(
+      "https://pix-backend-cfok.onrender.com/criar-pagamento",
+      { method: "POST" }
+    );
+
+    const d = await r.json();
+    window.location.href = d.init_point;
+
+  } catch {
+    box.innerHTML = "<p>❌ Erro ao iniciar pagamento.</p>";
+  }
 }
 </script>
 
