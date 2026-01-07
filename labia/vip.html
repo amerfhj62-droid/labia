@@ -232,8 +232,30 @@ body{
    </div>
   </div>
 
-  <div class="messages" id="chat"></div>
-  <div class="buttons" id="buttons"></div>
+<div class="messages" id="chat"></div>
+
+<!-- ✅ BOTÃO JÁ PAGUEI (NOVO) -->
+<div id="jaPagueiContainer"
+     style="display:none; text-align:center; padding:10px; background:#f7f7f7;">
+  <button
+    onclick="checarPagamento()"
+    style="
+      background:#0a8f3c;
+      color:#fff;
+      padding:12px 28px;
+      border:none;
+      border-radius:22px;
+      font-size:16px;
+      font-weight:800;
+      cursor:pointer;
+      width:100%;
+      max-width:320px;
+    ">
+    ✅ Já paguei
+  </button>
+</div>
+
+<div class="buttons" id="buttons"></div>
 </div>
 
 <script>
@@ -275,15 +297,15 @@ botMsg("⚠️ Usando:\n⚜ Psicologia Obscura\n🌀 Manipulação Emocional\n�
 
 botMsg("📲 2 mil mensagens prontas baseadas em psicologia e manipulação.\nFaz ela responder na mesma hora. 🔞", 8800);
 
-botMsg("🔥 Faça qualquer pessoa comer na sua mão e ficar louca pra te dar. 😈🔞", 10000);
+botMsg("🔥 Faça qualquer pessoa comer na sua mão e ficar louca pra te dar. 😈🔞", 9000);
 
-botMsg("Para manter tudo funcionando e ajudar nas manutenções,\ncobramos apenas um valor simbólico de R$10.\n\nQuem entra aqui não paga… investe em si mesmo 🔞", 12200);
+botMsg("Para manter tudo funcionando e ajudar nas manutenções,\ncobramos apenas um valor simbólico de R$10.\n\nQuem entra aqui não paga… investe em si mesmo 🔞", 9500);
 
 /* ===== BOTÃO ÚNICO ===== */
 setTimeout(()=>{
   setButtons([
     { text: "💳 Gerar PIX R$10", action: gerarPix },
-    { text:"⚡ Pague com 1 clique", action:abrirBancos }
+    { text:"⚡ Pague com 1 clique", action: pagar1Clique }
   ]);
 }, 10000);
 
@@ -297,12 +319,6 @@ function copiarPix(){
   navigator.clipboard.writeText(input.value);
 
   alert("✅ Código PIX copiado!");
-
-  // ⏳ Mostrar botão "Já paguei" após 4 segundos
-  setTimeout(() => {
-    const btn = document.getElementById("jaPagueiBtn");
-    if (btn) btn.style.display = "block";
-  }, 4000);
 }
 
 async function checarPagamento() {
@@ -358,12 +374,6 @@ async function gerarPix(){
 
         <button onclick="copiarPix()">📋 Copiar código PIX</button>
 
-        <button
-          id="jaPagueiBtn"
-          onclick="checarPagamento()"
-          style="display:none;margin-top:6px;background:#0a8f3c;">
-          ✅ Já paguei
-        </button>
       </div>
     `, 1200);
      
@@ -389,35 +399,71 @@ function fecharBancos(){
   document.getElementById("bankModal").classList.add("hidden");
 }
 
-async function pagar1Clique() {
-  const box = document.querySelector(".bank-box");
-  box.innerHTML = "<p>Conectando com seu banco...</p>";
+// 🚀 NOVA FUNÇÃO — abre o app do banco
+function abrirBanco(banco) {
+  let url = "";
 
-  try {
-    const r = await fetch(
-      "https://pix-backend-cfok.onrender.com/criar-pagamento",
-      { method: "POST" }
-    );
-
-    const d = await r.json();
-    window.location.href = d.init_point;
-
-  } catch (e) {
-    box.innerHTML = "<p>❌ Erro ao iniciar pagamento.</p>";
+  switch (banco) {
+    case "nubank":
+      url = "nubank://";
+      break;
+    case "itau":
+      url = "itau://";
+      break;
+    case "inter":
+      url = "bancointer://";
+      break;
+    case "c6":
+      url = "c6bank://";
+      break;
+    case "neon":
+      url = "neon://";
+      break;
+    default:
+      alert("Banco não suportado.");
+      return;
   }
+
+  // fecha o modal
+  fecharBancos();
+
+  // tenta abrir o app do banco
+  window.location.href = url;
 }
+
+function pagar1Clique() {
+  const pixInput = document.getElementById("pixCode");
+  if (!pixInput || !paymentId) {
+    alert("Gere o PIX primeiro.");
+    return;
+  }
+
+  // 1️⃣ copia o PIX imediatamente
+  navigator.clipboard.writeText(pixInput.value);
+
+  // 2️⃣ abre seleção de banco (como já acontece hoje)
+  abrirBancos();
+
+// 3️⃣ após 5s, MOSTRA o botão "Já paguei" (sem mexer nos outros)
+  setTimeout(() => {
+  const jaPaguei = document.getElementById("jaPagueiContainer");
+  if (jaPaguei) jaPaguei.style.display = "block";
+}, 5000);
+
+}
+
 </script>
 
 <div id="bankModal" class="bank-modal hidden">
   <div class="bank-box">
     <h3>Escolha seu banco</h3>
 
-    <button onclick="pagar1Clique()">Nubank</button>
-    <button onclick="pagar1Clique()">Itaú</button>
-    <button onclick="pagar1Clique()">PagBank</button>
-    <button onclick="pagar1Clique()">Banco Inter</button>
-    <button onclick="pagar1Clique()">C6 Bank</button>
-    <button onclick="pagar1Clique()">Neon</button>
+    <button onclick="abrirBanco('nubank')">Nubank</button>
+    <button onclick="abrirBanco('itau')">Itaú</button>
+    <button onclick="abrirBanco('inter')">Banco Inter</button>
+    <button onclick="abrirBanco('c6')">C6 Bank</button>
+    <button onclick="abrirBanco('neon')">Neon</button>
+
 
     <p class="hint">
       O pagamento será aberto no app do banco, se disponível no seu celular.
