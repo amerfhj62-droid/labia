@@ -305,7 +305,7 @@ function copiarPix(){
   }, 4000);
 }
 
-async function checarPagamento(){
+async function checarPagamento() {
   if (!paymentId) return;
 
   botMsg("⏳ Verificando pagamento...", 300);
@@ -320,7 +320,7 @@ async function checarPagamento(){
     if (data.status === "approved") {
       localStorage.setItem("isVIP", "true");
 
-      botMsg("🎉 Pagamento confirmado! Seu acesso VIP foi liberado.", 800);
+      botMsg("🎉 Pagamento confirmado! Acesso VIP liberado.", 800);
 
       setTimeout(() => {
         window.location.href = "index.html";
@@ -328,7 +328,6 @@ async function checarPagamento(){
     } else {
       botMsg("⏳ Pagamento ainda não confirmado.", 800);
     }
-
   } catch (e) {
     botMsg("❌ Erro ao verificar pagamento.", 800);
   }
@@ -390,7 +389,7 @@ function fecharBancos(){
   document.getElementById("bankModal").classList.add("hidden");
 }
 
-async function pagar1Clique(){
+async function pagar1Clique() {
   const box = document.querySelector(".bank-box");
   box.innerHTML = "<p>Conectando com seu banco...</p>";
 
@@ -403,7 +402,7 @@ async function pagar1Clique(){
     const d = await r.json();
     window.location.href = d.init_point;
 
-  } catch {
+  } catch (e) {
     box.innerHTML = "<p>❌ Erro ao iniciar pagamento.</p>";
   }
 }
