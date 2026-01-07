@@ -568,7 +568,7 @@ function openTopic(i){
 
   chat.innerHTML = `
   ${messages[i]
-  .split(/\n-{3,}\n/)
+  .split(/\.\s*\n+/)
   .map((msg, msgIndex) => {
 
     const reactKey = `react_${i}_${msgIndex}`;
@@ -856,4 +856,3 @@ if (window.matchMedia("(display-mode: standalone)").matches) {
 
 </body>
 </html>
- 
