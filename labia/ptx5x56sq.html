@@ -226,6 +226,29 @@ Use --- para separar mensagens"></textarea>
   <button onclick="save()">Salvar Conteúdo</button>
 </div>
 
+<!-- ACESSO VIP ADMIN -->
+<div class="panel">
+  <h2>🎭 Entrar como VIP (Admin)</h2>
+
+  <button onclick="setVIP(true,'Thiago_Dono!')">
+    👑 Entrar como Thiago Dono
+  </button>
+
+  <button onclick="setVIP(true,'Filipe_DONO')">
+    👑 Entrar como Filipe Dono
+  </button>
+
+  <button onclick="setVIP(false,'Thiago')"
+          style="background:linear-gradient(135deg,#444,#777)">
+    🚫 Entrar como Usuário Normal
+  </button>
+
+  <button onclick="setVIP(true,'VIP')"
+          style="background:linear-gradient(135deg,#cfa43b,#ffda7b);color:#000">
+    ⭐ Entrar como VIP Padrão
+  </button>
+</div>
+
 <!-- GRÁFICO -->
 <div class="panel">
   <h2>📉 Atividade Semanal</h2>
@@ -337,6 +360,14 @@ for(let i=0;i<7;i++){
   b.className="bar";
   b.style.height=h+"%";
   chart.appendChild(b);
+}
+
+function setVIP(isVip, name){
+  localStorage.setItem("isVIP", String(isVip));
+  localStorage.setItem("vipName", name);
+
+  // entra no site principal já como VIP
+  window.location.href = "index.html";
 }
 </script>
 
