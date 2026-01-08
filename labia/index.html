@@ -431,12 +431,7 @@ const topics = [
     "Desafios Semanais",
 ];
 
-let messages = [...topics];
-
-const savedMessages = JSON.parse(localStorage.getItem("messages") || "[]");
-savedMessages.forEach((m,i)=>{
-  if(m) messages[i] = m;
-});
+let messages = [];
 
 const emojis=["🫦","🔥","💬","🔞","‼️","🏆","📱","📉","🗣️","🏴‍☠️","🍔","‼️","👁️","🔱","👑","🆕","💎"];
 
@@ -566,23 +561,23 @@ function openTopic(i){
 
   let clicked=JSON.parse(localStorage.getItem("clicked_"+i) || "{}");
 
-  chat.innerHTML = `
-  ${messages[i]
-  .split(/\.\s*\n+/)
-  .map((msg, msgIndex) => {
+chat.innerHTML = `
+  ${(messages[i] || "Conteúdo indisponível no momento.")
+    .split(/\n{2,}/)
+    .map((msg, msgIndex) => {
 
-    const reactKey = `react_${i}_${msgIndex}`;
-    const clickKey = `clicked_${i}_${msgIndex}`;
+      const reactKey = `react_${i}_${msgIndex}`;
+      const clickKey = `clicked_${i}_${msgIndex}`;
 
-    let reactions = JSON.parse(
-      localStorage.getItem(reactKey) ||
-      JSON.stringify({
-        "🔥": Math.floor(Math.random()*50000)+20000,
-        "❤️": Math.floor(Math.random()*50000)+20000,
-        "😎": Math.floor(Math.random()*50000)+20000,
-        "👏": Math.floor(Math.random()*50000)+20000
-      })
-    );
+      let reactions = JSON.parse(
+        localStorage.getItem(reactKey) ||
+        JSON.stringify({
+          "🔥": Math.floor(Math.random()*50000)+20000,
+          "❤️": Math.floor(Math.random()*50000)+20000,
+          "😎": Math.floor(Math.random()*50000)+20000,
+          "👏": Math.floor(Math.random()*50000)+20000
+        })
+      );
 
     localStorage.setItem(reactKey, JSON.stringify(reactions));
 
@@ -674,16 +669,6 @@ window.addEventListener("popstate",()=>{
 });
 
 
-function save(){
-  const i = document.getElementById("topic").value;
-  const m = document.getElementById("msg").value;
-
-  let s = JSON.parse(localStorage.getItem("messages") || "[]");
-  s[i] = m;
-  localStorage.setItem("messages", JSON.stringify(s));
-
-  alert("Publicado!");
-}
 
 /* ================= CRESCIMENTO AUTOMÁTICO DE REAÇÕES ================= */
 
@@ -741,6 +726,29 @@ function startReactionDrift(){
 
   }, 4000); // velocidade geral
 }
+
+const BACKEND_URL = "https://pix-backend-cfok.onrender.com";
+
+function carregarConteudo() {
+  fetch(`${BACKEND_URL}/conteudo`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data.texto) {
+        console.warn("Nenhum conteúdo recebido");
+        return;
+      }
+
+      // separa por tópicos
+      messages = data.texto.split(/\n{2,}/);
+      render();
+    })
+    .catch(err => {
+      console.error("Erro ao carregar conteúdo:", err);
+    });
+}
+
+carregarConteudo();
+
 
 // inicia automaticamente
 startReactionDrift();
@@ -852,6 +860,26 @@ if (window.matchMedia("(display-mode: standalone)").matches) {
   localStorage.setItem("appInstalled", "true");
   cornerBtn.classList.add("hidden");
 }
+
+const BACKEND_URL = "https://pix-backend-cfok.onrender.com/conteudo";
+
+function carregarConteudo() {
+  fetch(`${BACKEND_URL}/conteudo`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data.texto) return;
+
+      // separa os tópicos pelo padrão que você usar no admin
+      messages = data.texto.split(/\n{2,}/);
+
+      render();
+    })
+    .catch(err => {
+      console.error("Erro ao carregar conteúdo:", err);
+    });
+}
+
+carregarConteudo();
 </script>
 
 </body>
