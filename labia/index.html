@@ -400,6 +400,20 @@ body{margin:0;font-family:system-ui,Arial;background:#000;display:flex;justify-c
 </div>
 
 <script>
+const startTime = Date.now();
+window.addEventListener("beforeunload", () => {
+  const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+
+  fetch("https://pix-backend-cfok.onrender.com/track", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      isVIP: localStorage.getItem("isVIP") === "true",
+      timeSpent
+    })
+  });
+});
+
 const isVIP = localStorage.getItem("isVIP") === "true";
 const userName = localStorage.getItem("vipName") || "VIP";
 
@@ -431,7 +445,6 @@ const topics = [
     "Desafios Semanais",
 ];
 
-let messages = [];
 
 const emojis=["🫦","🔥","💬","🔞","‼️","🏆","📱","📉","🗣️","🏴‍☠️","🍔","‼️","👁️","🔱","👑","🆕","💎"];
 
@@ -727,19 +740,15 @@ function startReactionDrift(){
   }, 4000); // velocidade geral
 }
 
+let messages = {};
+
 const BACKEND_URL = "https://pix-backend-cfok.onrender.com";
 
 function carregarConteudo() {
   fetch(`${BACKEND_URL}/conteudo`)
     .then(res => res.json())
     .then(data => {
-      if (!data.texto) {
-        console.warn("Nenhum conteúdo recebido");
-        return;
-      }
-
-      // separa por tópicos
-      messages = data.texto.split(/\n{2,}/);
+      messages = data.messages || {};
       render();
     })
     .catch(err => {
@@ -748,6 +757,7 @@ function carregarConteudo() {
 }
 
 carregarConteudo();
+
 
 
 // inicia automaticamente
@@ -861,25 +871,6 @@ if (window.matchMedia("(display-mode: standalone)").matches) {
   cornerBtn.classList.add("hidden");
 }
 
-const BACKEND_URL = "https://pix-backend-cfok.onrender.com";
-
-function carregarConteudo() {
-  fetch(`${BACKEND_URL}/conteudo`)
-    .then(res => res.json())
-    .then(data => {
-      if (!data.texto) return;
-
-      // separa os tópicos pelo padrão que você usar no admin
-      messages = data.texto.split(/\n{2,}/);
-
-      render();
-    })
-    .catch(err => {
-      console.error("Erro ao carregar conteúdo:", err);
-    });
-}
-
-carregarConteudo();
 </script>
 
 </body>
