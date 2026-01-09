@@ -19,3 +19,32 @@ self.addEventListener("fetch", event => {
     })
   );
 });
+
+// ===============================
+// PUSH NOTIFICATIONS
+// ===============================
+self.addEventListener("push", event => {
+  if (!event.data) return;
+
+  const data = event.data.json();
+
+  self.registration.showNotification(data.title, {
+    body: data.body,
+    icon: "/icon-192.png",
+    badge: "/icon-192.png",
+    data: {
+      url: data.url
+    }
+  });
+});
+
+self.addEventListener("notificationclick", event => {
+  event.notification.close();
+
+  const url = event.notification.data?.url;
+  if (url) {
+    event.waitUntil(
+      clients.openWindow(url)
+    );
+  }
+});
