@@ -317,6 +317,24 @@ body{margin:0;font-family:system-ui,Arial;background:#000;display:flex;justify-c
   100% { box-shadow: 0 0 6px rgba(255,215,0,.4); }
 }
 
+.vip-call{
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vip-cta-top{
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #3b2a00;
+  opacity: 0.85;
+}
+
+.vip-cta-main{
+  font-size: 14px;
+  font-weight: 900;
+}
+
 </style>
 </head>
 
@@ -341,7 +359,7 @@ body{margin:0;font-family:system-ui,Arial;background:#000;display:flex;justify-c
   </div>
 </div>
 
-<audio id="bgm" loop>
+<audio id="bgm" loop preload="auto">
   <source src="https://files.catbox.moe/zu8apj.mp3">
 </audio>
 
@@ -455,7 +473,9 @@ const overlay=document.getElementById("overlay");
 
 function showOverlay(){overlay.classList.add("show")}
 function closeOverlay(){overlay.classList.remove("show")}
-function isBlocked(i){return i>=4}
+function isBlocked(i){
+  return i === 1 || i >= 4;
+}
 
 /* ===== CONTADOR ONLINE DINÂMICO ===== */
 let onlineCount = Math.floor(Math.random() * 80000) + 115456;
@@ -503,7 +523,14 @@ const showVIP = localStorage.getItem("showVIP") === "true";
    const vipItem = document.createElement("a");
    vipItem.href = "vip.html";
    vipItem.className = "vip-call";
-   vipItem.innerText = "SEJA UM MEMBRO VIP POR APENAS 10 REAIS";
+   vipItem.innerHTML = `
+  <div class="vip-cta-top">
+    (CLIQUE AQUI 👇👇)
+  </div>
+  <div class="vip-cta-main">
+    SEJA UM MEMBRO VIP POR APENAS 10 REAIS
+  </div>
+`;
    list.appendChild(vipItem);
 }
 // ❗ sem else → não aparece nada
@@ -600,7 +627,13 @@ chat.innerHTML = `
 
     return `
       <div class="message">
-        ${msg.replace(/\n/g,"<br>")}
+        ${msg
+        .replace(
+        /\s*([\p{Emoji_Presentation}\p{Extended_Pictographic}])/gu,
+       "<br>$1"
+        )
+       .replace(/\n/g,"<br>")
+     }
       </div>
 
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px">
