@@ -419,17 +419,26 @@ body{margin:0;font-family:system-ui,Arial;background:#000;display:flex;justify-c
 
 <script>
 const startTime = Date.now();
-window.addEventListener("beforeunload", () => {
-  const timeSpent = Math.floor((Date.now() - startTime) / 1000);
 
-  fetch("https://pix-backend-cfok.onrender.com/track", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      isVIP: localStorage.getItem("isVIP") === "true",
-      timeSpent
+function notifyExit() {
+  if (localStorage.getItem("isVIP") === "true") return;
+
+  navigator.sendBeacon(
+    "https://pix-backend-cfok.onrender.com/user-exit",
+    JSON.stringify({
+      isVIP: false
     })
-  });
+  );
+}
+
+// quando fecha aba / app
+window.addEventListener("beforeunload", notifyExit);
+
+// quando minimiza ou troca de app (mobile)
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") {
+    notifyExit();
+  }
 });
 
 const isVIP = localStorage.getItem("isVIP") === "true";
